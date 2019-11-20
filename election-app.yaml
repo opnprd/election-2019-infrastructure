@@ -1,0 +1,37 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Election App Infrastructrure Stack
+Resources:
+  ElectionData:
+    Type: AWS::S3::Bucket
+    Properties: 
+      # AccessControl: String  
+      BucketName: odileeds-uk-election-2019
+      # NotificationConfiguration: 
+      #   LambdaConfigurations: 
+      #     - LambdaConfiguration
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+  DataCollector:
+    Type: AWS::IAM::Group
+    Properties:
+      GroupName: !Join ['-', [!Ref 'AWS::Region', 'election-data-collector']]
+      Path: /election-2019/
+  CollectionPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      ManagedPolicyName: !Join ['-', [!Ref 'AWS::Region', 'data-collection']]
+      Path: /election-2019/
+      Description: Allows creation and update of election results
+      Groups:
+        - !Ref DataCollector
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action:
+              - 's3:PutObject'
+              - 's3:GetObject'
+            Resource: !Join ['/', [!GetAtt ElectionData.Arn, 'results', '*']]
