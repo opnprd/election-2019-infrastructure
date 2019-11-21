@@ -70,3 +70,13 @@ Resources:
               - 's3:PutObject'
               - 's3:PutObjectAcl'
             Resource: !Join ['/', [!GetAtt ElectionData.Arn, 'processed', '*']]
+  DataProcessor:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code:
+        S3Bucket: odileeds-code-staging
+        S3Key: election-2019/lambda.zip
+      Description: Processing Election Results data
+      Handler: process.enrich
+      Role: String
+      Runtime: nodejs12.x
