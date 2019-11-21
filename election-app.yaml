@@ -62,7 +62,6 @@ Resources:
       Path: /election-2019/
       Description: Role to enable data processing
       ManagedPolicyArns:
-        - !Ref ProcessingPolicy
         - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
       AssumeRolePolicyDocument:
         Version: 2012-10-17
@@ -79,6 +78,8 @@ Resources:
       ManagedPolicyName: !Join ['-', [!Ref 'AWS::Region', 'data-processing']]
       Path: /election-2019/
       Description: Allows summarisation and processing election results
+      Roles:
+        - !Ref DataProcessor
       PolicyDocument:
         Version: 2012-10-17
         Statement:
