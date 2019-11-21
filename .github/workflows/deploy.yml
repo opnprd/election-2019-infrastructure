@@ -52,9 +52,11 @@ jobs:
       - uses: actions/download-artifact@v1
         with:
           name: lambda-zip
+          path: build/lambda.zip
       - uses: actions/download-artifact@v1
         with:
           name: lambda-version
+          path: build/.version
       - name: Deploy stack
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.aws_access_key_id }}
