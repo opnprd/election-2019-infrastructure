@@ -18,7 +18,7 @@ jobs:
             ${{ runner.OS }}-
       - name: Download AWS client installer
         run: |
-          [ -d aws_install ] \|\| curl "https://d1vvhvl2y92vvt.cloudfront.net/awscli-exe-linux-x86_64.zip" -o temp.zip && unzip temp.zip -d aws_install && rm temp.zip
+          [ -d aws_install ] || curl "https://d1vvhvl2y92vvt.cloudfront.net/awscli-exe-linux-x86_64.zip" -o temp.zip && unzip temp.zip -d aws_install && rm temp.zip
       - name: Setup AWS client
         run: sudo aws_install/aws/install
   deploy:
