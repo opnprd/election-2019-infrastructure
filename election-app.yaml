@@ -61,7 +61,7 @@ Resources:
       RoleName: !Join ['-', [!Ref 'AWS::Region', 'election-data-processor']]
       Path: /election-2019/
       Description: Role to enable data processing
-      Policies:
+      ManagedPolicyArns:
         - !GetAtt ProcessingPolicy.Arn
         - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
       AssumeRolePolicyDocument:
