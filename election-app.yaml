@@ -47,7 +47,7 @@ Resources:
           - Effect: Allow
             Principal:
               Service:
-                - lambda.amazonaws.com;
+                - lambda.amazonaws.com
             Action:
               - 'sts:AssumeRole'
   ProcessingPolicy:
