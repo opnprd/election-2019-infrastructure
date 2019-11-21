@@ -7,11 +7,11 @@ jobs:
   setup:
     runs-on: ubuntu-latest
     steps:
-      - name: Setup AWS
+      - name: Download AWS client installer
         run: |
-          curl "https://d1vvhvl2y92vvt.cloudfront.net/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-          unzip awscliv2.zip
-          sudo ./aws/install
+          curl "https://d1vvhvl2y92vvt.cloudfront.net/awscli-exe-linux-x86_64.zip" -o temp.zip && unzip temp.zip -d aws_install && rm temp.zip
+      - name: Setup AWS client
+        run: sudo aws_install/aws/install
   deploy:
     needs: [setup]
     runs-on: ubuntu-latest
