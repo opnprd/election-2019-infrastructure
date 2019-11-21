@@ -1,14 +1,17 @@
-const { src, dest, series } = require('gulp');
-const fs = require('fs');
-const { promisify } = require('util');
-const zip = require('gulp-zip');
 const { S3 } = require('aws-sdk');
+const fs = require('fs');
+const { src, dest, series } = require('gulp');
+const zip = require('gulp-zip');
+const ProgressBar = require('progress')
+const { promisify } = require('util');
 
-const readFile = promisify(fs.readFile);
 const writeFile = promisify(fs.writeFile);
 
-const codeBucket = 'odileeds-code-staging';
-const packagePath = 'election-2019/lambda.zip';
+const putOptions = (contents) => ({
+  Bucket: 'odileeds-code-staging',
+  Key: 'election-2019/lambda.zip',
+  Body: contents,
+});
 
 const s3 = new S3({
   apiVersion: '2006-03-01',
@@ -18,7 +21,7 @@ const s3 = new S3({
   }
 });
 
-async function package () {
+function package () {
   return src([
     'src/**/*.js',
   ])
@@ -27,13 +30,25 @@ async function package () {
 }
 
 async function publish () {
-  const archive = 'build/lambda.zip';
-  const fileBuffer = await readFile(archive);
-  const uploadResult = await s3.putObject({
-    Body: fileBuffer,
-    Bucket: codeBucket,
-    Key: packagePath,
-  }).promise();
+  const filePath = './build/lambda.zip';
+  const fileStream = fs.createReadStream(filePath)
+
+  let progress = null
+  let uploaded = 0
+  const progressHandler = (stats) => {
+    if (!progress) {
+      progress = new ProgressBar(
+        '  uploading [:bar] :percent :etas',
+        { total: stats.total, width: 30 }
+      )
+    }
+    progress.tick(stats.loaded - uploaded)
+    uploaded = stats.loaded
+  }
+
+  const uploadResult = await s3.putObject(putOptions(fileStream))
+    .on('httpUploadProgress', progressHandler).promise();
+
   await writeFile('./build/.version', uploadResult.VersionId);
 }
 
