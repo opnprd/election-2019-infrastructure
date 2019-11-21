@@ -32,6 +32,16 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.aws_access_key_id }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.aws_secret_access_key }}
         run: gulp
+      - name: Upload code pacakge
+        uses: actions/upload-artifact@v1
+        with:
+          name: lambda-zip
+          path: build/lambda.zip
+      - name: Upload code version
+        uses: actions/upload-artifact@v1
+        with:
+          name: lambda-version
+          path: build/.version
   deploy:
     needs:
       - setup
@@ -39,6 +49,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
+      - uses: actions/download-artifact@v1
+        with:
+          name: lambda-zip
+      - uses: actions/download-artifact@v1
+        with:
+          name: lambda-version
       - name: Deploy stack
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.aws_access_key_id }}
