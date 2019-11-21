@@ -78,5 +78,5 @@ Resources:
         S3Key: election-2019/lambda.zip
       Description: Processing Election Results data
       Handler: process.enrich
-      Role: String
+      Role: !GetAtt DataProcessor.Arn
       Runtime: nodejs12.x
