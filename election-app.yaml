@@ -77,6 +77,6 @@ Resources:
         S3Bucket: odileeds-code-staging
         S3Key: election-2019/lambda.zip
       Description: Processing Election Results data
-      Handler: process.enrich
+      Handler: lambda.enrich
       Role: !GetAtt DataProcessor.Arn
       Runtime: nodejs12.x
