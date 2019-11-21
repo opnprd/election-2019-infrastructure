@@ -1,19 +1,39 @@
 AWSTemplateFormatVersion: "2010-09-09"
 Description: Election App Infrastructrure Stack
+Parameters:
+  BucketName:
+    Type: String
+    Default: odileeds-uk-election-2019
 Resources:
   ElectionData:
     Type: AWS::S3::Bucket
     Properties: 
       # AccessControl: String  
-      BucketName: odileeds-uk-election-2019
-      # NotificationConfiguration: 
-      #   LambdaConfigurations: 
-      #     - LambdaConfiguration
+      BucketName: !Ref BucketName
+      NotificationConfiguration: 
+        LambdaConfigurations: 
+          - Event: 's3:ObjectCreated:*'
+            Filter:
+              S3Key: 
+                Rules:
+                  - Name: prefix
+                    Value: results/
+                  - Name: suffix
+                    Value: .json
+            Function: !GetAtt DataProcessingFunction.Arn
       PublicAccessBlockConfiguration:
         BlockPublicAcls: false
         BlockPublicPolicy: true
         IgnorePublicAcls: true
         RestrictPublicBuckets: true
+  TriggerDataProcessingPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !Ref DataProcessingFunction
+      Principal: s3.amazonaws.com
+      SourceArn: !Sub arn:aws:s3:::${BucketName}
+
   DataCollector:
     Type: AWS::IAM::Group
     Properties:
