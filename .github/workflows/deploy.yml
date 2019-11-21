@@ -21,8 +21,18 @@ jobs:
           [ -d aws_install ] || ( curl "https://d1vvhvl2y92vvt.cloudfront.net/awscli-exe-linux-x86_64.zip" -o temp.zip && unzip temp.zip -d aws_install && rm temp.zip )
       - name: Setup AWS client
         run: sudo aws_install/aws/install
+  package:
+    runs-on: ubuntu-16.04
+    steps:
+      - uses: actions/checkout@v1
+      - name: Install dependencies
+        run: npm install
+      - name: Build
+        run: gulp
   deploy:
-    needs: [setup]
+    needs:
+      - setup
+      - package
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
@@ -31,4 +41,4 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.aws_access_key_id }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.aws_secret_access_key }}
           AWS_DEFAULT_REGION: ${{ secrets.aws_default_region }}
-        run: aws cloudformation deploy --template-file "./election-app.yaml" --stack-name odileeds-uk-election-2019 --s3-bucket odileeds-code-staging --s3-prefix election-2019 --capabilities CAPABILITY_NAMED_IAM --no-fail-on-empty-changeset
+        run: aws cloudformation deploy --template-file "./election-app.yaml" --stack-name odileeds-uk-election-2019 --s3-bucket odileeds-code-staging --s3-prefix election-2019 --capabilities CAPABILITY_NAMED_IAM --no-fail-on-empty-changeset --parameter-overrides CodeVersion=$(cat build/.version)

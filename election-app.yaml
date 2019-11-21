@@ -4,6 +4,8 @@ Parameters:
   BucketName:
     Type: String
     Default: odileeds-uk-election-2019
+  CodeVersion:
+    Type: String
 Resources:
   ElectionData:
     Type: AWS::S3::Bucket
@@ -98,6 +100,7 @@ Resources:
       Code:
         S3Bucket: odileeds-code-staging
         S3Key: election-2019/lambda.zip
+        S3ObjectVersion: !Ref CodeVersion
       Description: Processing Election Results data
       Handler: lambda.enrich
       Role: !GetAtt DataProcessor.Arn
