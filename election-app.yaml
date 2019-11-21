@@ -10,7 +10,7 @@ Resources:
       #   LambdaConfigurations: 
       #     - LambdaConfiguration
       PublicAccessBlockConfiguration:
-        BlockPublicAcls: true
+        BlockPublicAcls: false
         BlockPublicPolicy: true
         IgnorePublicAcls: true
         RestrictPublicBuckets: true
@@ -35,3 +35,21 @@ Resources:
               - 's3:PutObject'
               - 's3:GetObject'
             Resource: !Join ['/', [!GetAtt ElectionData.Arn, 'results', '*']]
+  ProcessingPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      ManagedPolicyName: !Join ['-', [!Ref 'AWS::Region', 'data-processing']]
+      Path: /election-2019/
+      Description: Allows summarisation and processing election results
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action:
+              - 's3:GetObject'
+            Resource: !Join ['/', [!GetAtt ElectionData.Arn, 'results', '*']]
+          - Effect: Allow
+            Action:
+              - 's3:PutObject'
+              - 's3:PutObjectAcl'
+            Resource: !Join ['/', [!GetAtt ElectionData.Arn, 'processed', '*']]
