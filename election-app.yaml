@@ -62,7 +62,7 @@ Resources:
       Path: /election-2019/
       Description: Role to enable data processing
       ManagedPolicyArns:
-        - !GetAtt ProcessingPolicy.Arn
+        - !Ref ProcessingPolicy
         - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
       AssumeRolePolicyDocument:
         Version: 2012-10-17
