@@ -7,9 +7,18 @@ jobs:
   setup:
     runs-on: ubuntu-latest
     steps:
+      - name: Cache inastaller files
+        uses: actions/cache@v1
+        with:
+          path: aws_install
+          key: ${{ runner.OS }}-deploy
+          restore-keys: |
+            ${{ runner.OS }}-build-${{ env.cache-name }}-
+            ${{ runner.OS }}-build-
+            ${{ runner.OS }}-
       - name: Download AWS client installer
         run: |
-          curl "https://d1vvhvl2y92vvt.cloudfront.net/awscli-exe-linux-x86_64.zip" -o temp.zip && unzip temp.zip -d aws_install && rm temp.zip
+          [ -d aws_install ] \|\| curl "https://d1vvhvl2y92vvt.cloudfront.net/awscli-exe-linux-x86_64.zip" -o temp.zip && unzip temp.zip -d aws_install && rm temp.zip
       - name: Setup AWS client
         run: sudo aws_install/aws/install
   deploy:
