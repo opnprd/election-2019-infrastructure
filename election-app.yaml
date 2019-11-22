@@ -91,6 +91,10 @@ Resources:
             Resource: !Join ['/', [!GetAtt ElectionData.Arn, 'results', '*']]
           - Effect: Allow
             Action:
+              - 's3:ListBucket'
+            Resource: !GetAtt ElectionData.Arn
+          - Effect: Allow
+            Action:
               - 's3:PutObject'
               - 's3:PutObjectAcl'
             Resource: !Join ['/', [!GetAtt ElectionData.Arn, 'processed', '*']]
