@@ -8,18 +8,19 @@ const bucketPath = 'results/';
 async function getObjectList({ bucket, prefix }) {
   const objects = [];
   const pageSize = 2;
-  // TODO: deal with continuations if > max number.
-  // let truncated;
-  // do {
+
+  let truncated;
+  let continuationToken;
+  do {
     const results = await s3.listObjectsV2({
       Bucket: bucket,
       Prefix: prefix,
       MaxKeys: pageSize,
+      ContinuationToken: continuationToken,
     }).promise();
-    console.log(results);
     objects.push(...results.Contents.map(x => x.Key));
-    // ({ IsTruncated: truncated }) = results;
-  // } while(truncated);
+    ({ IsTruncated: truncated, NextContinuationToken: continuationToken }) = results;
+  } while (truncated);
   return objects;
 }
 
