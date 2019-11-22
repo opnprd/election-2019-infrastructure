@@ -30,5 +30,5 @@ export async function getObjectContents(params: s3Location) {
     Bucket: bucket,
     Key: path,
   }).promise();
-  return object.Body;
+  return object.Body.toString('utf-8');
 }
