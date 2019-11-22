@@ -16,7 +16,7 @@ async function enrich(event, context) {
       Prefix: prefix,
       MaxKeys: pageSize,
     }).promise();
-    resultFiles.push(results.Contents.map(x => x.Key));
+    resultFiles.push(...results.Contents.map(x => x.Key));
     // ({ IsTruncated: truncated }) = results;
   // } while(truncated);
 
