@@ -5,6 +5,7 @@
     "deploy": "aws cloudformation deploy --template-file \"./election-app.yaml\" --stack-name odileeds-uk-election-2019 --s3-bucket odileeds-code-staging --force-upload --s3-prefix election-2019 --capabilities CAPABILITY_NAMED_IAM"
   },
   "devDependencies": {
+    "@types/node": "^12.12.11",
     "aws-sdk": "^2.577.0",
     "gulp": "^4.0.2",
     "gulp-typescript": "^6.0.0-alpha.1",
