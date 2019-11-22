@@ -33,8 +33,9 @@ jobs:
           restore-keys: |
             ${{ runner.OS }}-build-${{ env.cache-name }}-
             ${{ runner.OS }}-build-
-            ${{ runner.OS }}-      - name: Install dependencies
-          run: npm install
+            ${{ runner.OS }}-
+      - name: Install dependencies
+        run: npm install
       - name: Build
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.aws_access_key_id }}
