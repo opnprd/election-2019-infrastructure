@@ -3,23 +3,31 @@ const { S3 } = require('aws-sdk');
 const s3 = new S3();
 
 const bucketName = 'odileeds-uk-election-2019';
-const prefix = 'results/';
+const bucketPath = 'results/';
 
-async function enrich(event, context) {
+async function getObjectList({ bucket, prefix }) {
+  const objects = [];
+  const pageSize = 2;
   // TODO: deal with continuations if > max number.
-  const resultFiles = [];
-  const pageSize = 10;
   // let truncated;
   // do {
     const results = await s3.listObjectsV2({
-      Bucket: bucketName,
+      Bucket: bucket,
       Prefix: prefix,
       MaxKeys: pageSize,
     }).promise();
-    resultFiles.push(...results.Contents.map(x => x.Key));
+    console.log(results);
+    objects.push(...results.Contents.map(x => x.Key));
     // ({ IsTruncated: truncated }) = results;
   // } while(truncated);
+  return objects;
+}
 
+async function enrich(event, context) {
+  const resultFiles = getObjectList({
+    Bucket: bucketName,
+    Prefix: bucketPath,
+  })
   console.dir(resultFiles);
 }
 
