@@ -10,8 +10,9 @@ const { s3 } = require('./util/s3');
 const tsProject = ts.createProject('tsconfig.json');
 
 function compile () {
-  return tsProject.src()
+  const tsResult = tsProject.src()
     .pipe(tsProject());
+  return tsResult.js.pipe(dest('build'));
 }
 
 function package () {
