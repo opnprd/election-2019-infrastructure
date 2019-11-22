@@ -25,8 +25,8 @@ async function getObjectList({ bucket, prefix }) {
 
 async function enrich(event, context) {
   const resultFiles = await getObjectList({
-    Bucket: bucketName,
-    Prefix: bucketPath,
+    bucket: bucketName,
+    prefix: bucketPath,
   })
   console.dir(resultFiles);
 }
