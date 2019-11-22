@@ -44,8 +44,8 @@ jobs:
       - name: Upload build artefacts
         uses: actions/upload-artifact@v1
         with:
-          name: build
-          path: build
+          name: package-version
+          path: build/version
   deploy:
     needs:
       - setup
@@ -55,11 +55,12 @@ jobs:
       - uses: actions/checkout@v1
       - uses: actions/download-artifact@v1
         with:
-          name: build
-          path: build
+          name: package-version
+          path: build/version
+      - run: cat build/version
       - name: Deploy stack
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.aws_access_key_id }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.aws_secret_access_key }}
           AWS_DEFAULT_REGION: ${{ secrets.aws_default_region }}
-        run: aws cloudformation deploy --template-file "./election-app.yaml" --stack-name odileeds-uk-election-2019 --s3-bucket odileeds-code-staging --s3-prefix election-2019 --capabilities CAPABILITY_NAMED_IAM --no-fail-on-empty-changeset --parameter-overrides CodeVersion=$(cat build/.version)
+        run: aws cloudformation deploy --template-file "./election-app.yaml" --stack-name odileeds-uk-election-2019 --s3-bucket odileeds-code-staging --s3-prefix election-2019 --capabilities CAPABILITY_NAMED_IAM --no-fail-on-empty-changeset --parameter-overrides CodeVersion=$(cat build/version)
