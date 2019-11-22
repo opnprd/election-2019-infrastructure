@@ -24,7 +24,7 @@ async function getObjectList({ bucket, prefix }) {
 }
 
 async function enrich(event, context) {
-  const resultFiles = getObjectList({
+  const resultFiles = await getObjectList({
     Bucket: bucketName,
     Prefix: bucketPath,
   })
