@@ -8,5 +8,10 @@ export async function enrich(event, context) {
     bucket: bucketName,
     path: bucketPath,
   })
-  console.dir(resultFiles);
+  // TODO Get this to return a function, which is executed in batches
+  const processFile = resultFiles.map(async (key) => {
+    const content = await s3.getObjectContents({ bucket: bucketName, path: key });
+    console.log(content);
+  })
+  await Promise.all(processFile);
 }

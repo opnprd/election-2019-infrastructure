@@ -2,14 +2,13 @@ import * as AWS from 'aws-sdk';
 
 const s3 = new AWS.S3();
 
-interface bucketLocation {
+interface s3Location {
   bucket: string;
   path: string;
 }
 
-export async function getObjectList(params: bucketLocation): Promise<string[]> {
+export async function getObjectList(params: s3Location): Promise<string[]> {
   const objects: string[] = [];
-  const pageSize = 2;
 
   let truncated: boolean;
   let continuationToken: string;
@@ -17,7 +16,6 @@ export async function getObjectList(params: bucketLocation): Promise<string[]> {
     const results = await s3.listObjectsV2({
       Bucket: params.bucket,
       Prefix: params.path,
-      MaxKeys: pageSize,
       ContinuationToken: continuationToken,
     }).promise();
     objects.push(...results.Contents.map(x => x.Key));
@@ -26,3 +24,11 @@ export async function getObjectList(params: bucketLocation): Promise<string[]> {
   return objects;
 }
 
+export async function getObjectContents(params: s3Location) {
+  const { bucket, path } = params;
+  const object = await s3.getObject({
+    Bucket: bucket,
+    Key: path,
+  }).promise();
+  return object.Body;
+}
