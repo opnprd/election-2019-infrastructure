@@ -19,7 +19,7 @@ async function getObjectList({ bucket, prefix }) {
       ContinuationToken: continuationToken,
     }).promise();
     objects.push(...results.Contents.map(x => x.Key));
-    ({ IsTruncated: truncated, NextContinuationToken: continuationToken }) = results;
+    ({ IsTruncated: truncated, NextContinuationToken: continuationToken } = results);
   } while (truncated);
   return objects;
 }
