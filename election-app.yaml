@@ -42,6 +42,15 @@ Resources:
       RoleName: !Join ['-', [!Ref 'AWS::Region', 'election-data-collector']]
       Path: /election-2019/
       Description: Role to enable data processing
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - s3.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
 
   DataCollector:
     Type: AWS::IAM::Group
