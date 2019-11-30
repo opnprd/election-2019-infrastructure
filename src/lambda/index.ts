@@ -39,5 +39,5 @@ export async function enrich(event, context) {
     results.push(...result);
   }
   const summaryCsv = results.map(x => x.join(',')).join('\n');
-  s3.putObjectContents({ bucket: bucketName, path: summaryFile }, summaryCsv);
+  await s3.putObjectContents({ bucket: bucketName, path: summaryFile }, summaryCsv);
 }
