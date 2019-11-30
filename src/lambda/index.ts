@@ -1,18 +1,24 @@
+import { basename } from 'path';
 import * as s3 from './lib/s3';
-import { promises } from 'dns';
 
 const bucketName = 'odileeds-uk-election-2019';
 const bucketPath = 'public/results/';
+const outputBucketPath = 'processed/';
+const summaryFile = outputBucketPath + 'ge2019-summary.csv';
 
-function buildProcessor(key) {
+function buildProcessor(key: string) {
   return async () => {
-    const content = await s3.getObjectContents({ bucket: bucketName, path: key });
+    const filename = basename(key);
+    const resultSet = await s3.getObjectContents({ bucket: bucketName, path: key }).then(JSON.parse);
     // Reshape and add reference
-    await s3.putObjectContents({ bucket: bucketName, path: key }, content);
+    const { id, candidates } = resultSet;
+    const winner = candidates.sort((a,b) => b.votes - a.votes)[0].party.code;
+    await s3.putObjectContents({ bucket: bucketName, path: outputBucketPath + filename }, JSON.stringify(resultSet));
+    return [ id, winner ];
   }
 }
 
-function batcher(acc, current, index) {
+function batcher(acc, current: any, index: number) {
   const batch = Math.floor(index/10);
   acc.length = batch + 1;
   if (!Array.isArray(acc[batch])) acc[batch] = [];
@@ -26,8 +32,12 @@ export async function enrich(event, context) {
     path: bucketPath,
   })
   const processors = resultFiles.map(buildProcessor).reduce(batcher, []);
+  const results = [];
   while (processors.length) {
     const batch = processors.shift();
-    await Promise.all(batch.map((x: () => void) => x()))
+    const result = await Promise.all(batch.map(x => x()))
+    results.push(...result);
   }
+  const summaryCsv = results.map(x => x.join(',')).join('\n');
+  s3.putObjectContents({ bucket: bucketName, path: summaryFile }, summaryCsv);
 }
