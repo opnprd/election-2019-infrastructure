@@ -1,7 +1,7 @@
 import * as s3 from './lib/s3';
 
 const bucketName = 'odileeds-uk-election-2019';
-const bucketPath = 'results/';
+const bucketPath = 'public/results/';
 
 export async function enrich(event, context) {
   const resultFiles = await s3.getObjectList({
