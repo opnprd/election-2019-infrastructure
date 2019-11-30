@@ -28,6 +28,14 @@ Resources:
         BlockPublicPolicy: true
         IgnorePublicAcls: true
         RestrictPublicBuckets: true
+      CorsConfiguration:
+        CorsRules:
+        - AllowedOrigins: ['*']
+          AllowedMethods: [GET, HEAD, PUT, POST, DELETE]
+          MaxAge: '3000'
+          ExposedHeaders: [x-amz-server-side-encryption, x-amz-request-id, x-amz-id-2, ETag]
+          AllowedHeaders: ['*']
+          Id: amplifyAccess
   TriggerDataProcessingPermission:
     Type: AWS::Lambda::Permission
     Properties:
