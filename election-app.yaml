@@ -36,6 +36,13 @@ Resources:
       Principal: s3.amazonaws.com
       SourceArn: !Sub arn:aws:s3:::${BucketName}
 
+  DataCollectorRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Join ['-', [!Ref 'AWS::Region', 'election-data-collector']]
+      Path: /election-2019/
+      Description: Role to enable data processing
+
   DataCollector:
     Type: AWS::IAM::Group
     Properties:
@@ -47,6 +54,8 @@ Resources:
       ManagedPolicyName: !Join ['-', [!Ref 'AWS::Region', 'data-collection']]
       Path: /election-2019/
       Description: Allows creation and update of election results
+      Roles:
+        - !Ref DataCollectorRole
       Groups:
         - !Ref DataCollector
       PolicyDocument:
