@@ -4,7 +4,7 @@ import * as s3 from './lib/s3';
 const bucketName = 'odileeds-uk-election-2019';
 const bucketPath = 'public/results/';
 const outputBucketPath = 'processed/';
-const summaryFile = outputBucketPath + 'ge2019-summary.csv';
+const summaryFile = outputBucketPath + '2019-results.csv';
 
 function buildProcessor(key: string) {
   return async () => {
@@ -32,7 +32,7 @@ export async function enrich(event, context) {
     path: bucketPath,
   })
   const processors = resultFiles.map(buildProcessor).reduce(batcher, []);
-  const results = [];
+  const results = [[ 'ccode', 'first19' ]];
   while (processors.length) {
     const batch = processors.shift();
     const result = await Promise.all(batch.map(x => x()))
