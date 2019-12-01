@@ -9,10 +9,10 @@ Parameters:
 Resources:
   ElectionData:
     Type: AWS::S3::Bucket
+    DeletionPolicy: Retain
     Properties: 
       AccessControl: PublicRead
       BucketName: !Ref BucketName
-      DeletionPolicy: Retain
       NotificationConfiguration: 
         LambdaConfigurations: 
           - Event: 's3:ObjectCreated:*'
