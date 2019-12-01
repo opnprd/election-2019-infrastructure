@@ -33,11 +33,12 @@ export async function getObjectContents(params: s3Location) {
   return object.Body.toString('utf-8');
 }
 
-export async function putObjectContents(params: s3Location, content: string) {
+export async function putObjectContents(params: s3Location, content: string, acl?: string) {
   const { bucket, path } = params;
   const object = await s3.putObject({
     Bucket: bucket,
     Key: path,
     Body: content,
+    ACL: acl,
   }).promise();
 }

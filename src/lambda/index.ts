@@ -13,7 +13,7 @@ function buildProcessor(key: string) {
     // Reshape and add reference
     const { id, candidates } = resultSet;
     const winner = candidates.sort((a,b) => b.votes - a.votes)[0].party.code;
-    await s3.putObjectContents({ bucket: bucketName, path: outputBucketPath + filename }, JSON.stringify(resultSet));
+    await s3.putObjectContents({ bucket: bucketName, path: outputBucketPath + filename }, JSON.stringify(resultSet), 'public-read');
     return [ id, winner ];
   }
 }
@@ -39,5 +39,5 @@ export async function enrich(event, context) {
     results.push(...result);
   }
   const summaryCsv = results.map(x => x.join(',')).join('\n');
-  await s3.putObjectContents({ bucket: bucketName, path: summaryFile }, summaryCsv);
+  await s3.putObjectContents({ bucket: bucketName, path: summaryFile }, summaryCsv, 'public-read');
 }
