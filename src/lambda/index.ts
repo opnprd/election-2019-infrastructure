@@ -11,7 +11,7 @@ function buildProcessor(key: string) {
     const filename = basename(key);
     const resultSet = await s3.getObjectContents({ bucket: bucketName, path: key }).then(JSON.parse);
     // Reshape and add reference
-    const { id, candidates } = resultSet;
+    const { id, elections: { 2019: { candidates } } = resultSet;
     const winner = candidates.sort((a,b) => b.votes - a.votes)[0].party.code;
     await s3.putObjectContents({ bucket: bucketName, path: outputBucketPath + filename }, JSON.stringify(resultSet), 'public-read');
     return [ id, winner ];
