@@ -1,5 +1,6 @@
 import { basename } from 'path';
 import * as s3 from './lib/s3';
+import feed from './lib/rss';
 
 const bucketName = 'odileeds-uk-election-2019';
 const bucketPath = 'public/results/';
@@ -11,7 +12,9 @@ function buildProcessor(key: string) {
     const filename = basename(key);
     const resultSet = await s3.getObjectContents({ bucket: bucketName, path: key }).then(JSON.parse);
     // Reshape and add reference
-    const { id, elections: { 2019: { candidates } } } = resultSet;
+    const { id, elections: { 2019: { candidates } }, events: [ summary ] } = resultSet;
+    const feedItem = { date: summary.date, title: summary.title, guid: id };
+    feed.item(feedItem);
     const winner = candidates.sort((a,b) => b.votes - a.votes)[0].party.code;
     await s3.putObjectContents({ bucket: bucketName, path: outputBucketPath + filename }, JSON.stringify(resultSet), 'public-read');
     return [ id, winner ];
@@ -39,5 +42,8 @@ export async function enrich(event, context) {
     results.push(...result);
   }
   const summaryCsv = results.map(x => x.join(',')).join('\n');
+  console.log(feed.xml());
   await s3.putObjectContents({ bucket: bucketName, path: summaryFile }, summaryCsv, 'public-read');
 }
+
+enrich({}, {}).then(()=> console.log('Done'));

@@ -12,5 +12,7 @@
     "gulp-zip": "^5.0.1",
     "typescript": "^3.7.2"
   },
-  "dependencies": {}
+  "dependencies": {
+    "rss": "^1.2.2"
+  }
 }

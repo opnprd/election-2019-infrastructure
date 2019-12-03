@@ -3,6 +3,10 @@ const { src, dest, series } = require('gulp');
 const ts = require('gulp-typescript');
 const zip = require('gulp-zip');
 
+const { promisify } = require('util');
+const exec = promisify(require('child_process').exec);
+const path = require('path');
+
 const { getFileHash, getS3Hash } = require('./util/hash');
 const { writeFile } = require('./util/async-fs');
 const { s3 } = require('./util/s3');
@@ -13,6 +17,13 @@ function compile () {
   const tsResult = tsProject.src()
     .pipe(tsProject());
   return tsResult.js.pipe(dest('build'));
+}
+
+async function installDependencies () {
+  src([ 'package*.json' ]).pipe(dest('build'));
+  await exec('npm ci --only=prod', {
+    cwd: path.resolve(__dirname, 'build'),
+  });
 }
 
 function package () {
@@ -48,8 +59,9 @@ async function publish () {
 }
 
 module.exports = {
-  default: series(compile, package, publish),
+  default: series(installDependencies, compile, package, publish),
   compile,
+  installDependencies,
   package,
   publish,
 };
