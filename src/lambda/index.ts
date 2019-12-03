@@ -45,8 +45,8 @@ export async function enrich(event, context) {
     results.push(...result);
   }
   const summaryCsv = results.map(x => x.join(',')).join('\n');
-  await Promise.all[
+  await Promise.all([
     s3.putObjectContents({ bucket: bucketName, path: summaryFile }, summaryCsv, 'public-read'),
     s3.putObjectContents({ bucket: bucketName, path: atomFeed}, feed.atom1(), 'public-read'),
-  ];
+  ]);
 }
