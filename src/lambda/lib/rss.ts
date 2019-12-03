@@ -3,10 +3,12 @@
  */ 
 import { Feed } from "feed";
 
+export const link = 'https://britainelects.newstatesman.com/live-results/';
+
 const feed = new Feed({
   title: 'General Election 2019 Results',
-  id: 'https://britainelects.newstatesman.com/2019-results/',
-  link: 'https://britainelects.newstatesman.com/2019-results/',
+  id: link,
+  link: link,
   updated: new Date(),
   copyright: 'All rights reserved Britain Elects / New Statesman',
 });
