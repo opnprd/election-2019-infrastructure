@@ -7,6 +7,7 @@ const bucketPath = 'public/results/';
 const outputBucketPath = 'processed/';
 const summaryFile = outputBucketPath + '2019-results.csv';
 const atomFeed = outputBucketPath + 'feed.atom';
+const rssFeed = outputBucketPath + 'feed.rss';
 
 const link = 'https://britainelects.newstatesman.com/results-2019/';
 
@@ -48,5 +49,6 @@ export async function enrich(event, context) {
   await Promise.all([
     s3.putObjectContents({ bucket: bucketName, path: summaryFile }, summaryCsv, { acl: 'public-read', contentType: 'text/csv' }),
     s3.putObjectContents({ bucket: bucketName, path: atomFeed}, feed.atom1(), { acl: 'public-read', contentType: 'application/atom+xml' }),
+    s3.putObjectContents({ bucket: bucketName, path: rssFeed}, feed.rss2(), { acl: 'public-read', contentType: 'application/rss+xml' }),
   ]);
 }
