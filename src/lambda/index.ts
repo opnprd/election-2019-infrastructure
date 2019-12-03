@@ -6,6 +6,7 @@ const bucketName = 'odileeds-uk-election-2019';
 const bucketPath = 'public/results/';
 const outputBucketPath = 'processed/';
 const summaryFile = outputBucketPath + '2019-results.csv';
+const atomFeed = outputBucketPath + 'feed.atom';
 
 const link = 'https://britainelects.newstatesman.com/results-2019/';
 
@@ -15,7 +16,7 @@ function buildProcessor(key: string) {
     const resultSet = await s3.getObjectContents({ bucket: bucketName, path: key }).then(JSON.parse);
     // Reshape and add reference
     const { id, elections: { 2019: { candidates } }, events: [ summary ] } = resultSet;
-    const feedItem = { date: new Date(summary.date), link, title: summary.title, id };
+    const feedItem = { date: new Date(summary.date), link, title: summary.message, id };
     feed.addItem(feedItem);
     const winner = candidates.sort((a,b) => b.votes - a.votes)[0].party.code;
     await s3.putObjectContents({ bucket: bucketName, path: outputBucketPath + filename }, JSON.stringify(resultSet), 'public-read');
@@ -44,6 +45,8 @@ export async function enrich(event, context) {
     results.push(...result);
   }
   const summaryCsv = results.map(x => x.join(',')).join('\n');
-  console.log(feed.rss2());
-  await s3.putObjectContents({ bucket: bucketName, path: summaryFile }, summaryCsv, 'public-read');
+  await Promise.all[
+    s3.putObjectContents({ bucket: bucketName, path: summaryFile }, summaryCsv, 'public-read'),
+    s3.putObjectContents({ bucket: bucketName, path: atomFeed}, feed.atom1(), 'public-read'),
+  ];
 }
