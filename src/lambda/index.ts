@@ -19,7 +19,7 @@ function buildProcessor(key: string) {
     const feedItem = { date: new Date(summary.date), link, title: summary.message, id };
     feed.addItem(feedItem);
     const winner = candidates.sort((a,b) => b.votes - a.votes)[0].party.code;
-    await s3.putObjectContents({ bucket: bucketName, path: outputBucketPath + filename }, JSON.stringify(resultSet), 'public-read');
+    await s3.putObjectContents({ bucket: bucketName, path: outputBucketPath + filename }, JSON.stringify(resultSet), { acl: 'public-read', contentType: 'application/json' });
     return [ id, winner ];
   }
 }
@@ -46,7 +46,7 @@ export async function enrich(event, context) {
   }
   const summaryCsv = results.map(x => x.join(',')).join('\n');
   await Promise.all([
-    s3.putObjectContents({ bucket: bucketName, path: summaryFile }, summaryCsv, 'public-read'),
-    s3.putObjectContents({ bucket: bucketName, path: atomFeed}, feed.atom1(), 'public-read'),
+    s3.putObjectContents({ bucket: bucketName, path: summaryFile }, summaryCsv, { acl: 'public-read', contentType: 'application/json' }),
+    s3.putObjectContents({ bucket: bucketName, path: atomFeed}, feed.atom1(), { acl: 'public-read', contentType: 'application/atom+xml' }),
   ]);
 }

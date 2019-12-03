@@ -30,6 +30,7 @@ async function publish () {
   const localHash = await getFileHash(filePath);
 
   if (latestS3Version.hash === localHash) {
+    // eslint-disable-next-line no-console
     console.log('Package file has not changed');
     await writeFile(versionPath, latestS3Version.version);
     return;    

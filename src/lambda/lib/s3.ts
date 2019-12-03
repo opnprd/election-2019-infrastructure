@@ -1,4 +1,5 @@
 import * as AWS from 'aws-sdk';
+import { CognitoIdentityServiceProvider } from 'aws-sdk';
 
 const s3 = new AWS.S3();
 
@@ -33,12 +34,18 @@ export async function getObjectContents(params: s3Location) {
   return object.Body.toString('utf-8');
 }
 
-export async function putObjectContents(params: s3Location, content: string, acl?: string) {
+interface putOptions {
+  acl?: string,
+  contentType?: string,
+}
+
+export async function putObjectContents(params: s3Location, content: string, options: putOptions ) {
   const { bucket, path } = params;
   const object = await s3.putObject({
     Bucket: bucket,
     Key: path,
     Body: content,
-    ACL: acl,
+    ACL: options.acl,
+    ContentType: options.contentType,
   }).promise();
 }
