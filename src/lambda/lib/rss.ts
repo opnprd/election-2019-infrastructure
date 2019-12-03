@@ -1,15 +1,14 @@
 /**
  * https://www.npmjs.com/package/rss
  */ 
-import * as RSS from 'rss';
+import { Feed } from "feed";
 
-const pubDate = new Date().toISOString();
-
-const feed = new RSS({
+const feed = new Feed({
   title: 'General Election 2019 Results',
-  feed_url: '',
-  site_url: 'https://britainelects.newstatesman.com/2019-results/',
-  pubDate,
+  id: 'https://britainelects.newstatesman.com/2019-results/',
+  link: 'https://britainelects.newstatesman.com/2019-results/',
+  updated: new Date(),
+  copyright: 'All rights reserved Britain Elects / New Statesman',
 });
 
 export default feed;

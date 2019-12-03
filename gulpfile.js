@@ -1,29 +1,17 @@
 const { createReadStream } = require('fs');
 const { src, dest, series } = require('gulp');
-const ts = require('gulp-typescript');
 const zip = require('gulp-zip');
 
-const { promisify } = require('util');
-const exec = promisify(require('child_process').exec);
-const path = require('path');
+const rollup = require('rollup');
+const { bundleConfig, outputConfig } = require('./rollup.settings');
 
 const { getFileHash, getS3Hash } = require('./util/hash');
 const { writeFile } = require('./util/async-fs');
 const { s3 } = require('./util/s3');
 
-const tsProject = ts.createProject('tsconfig.json');
-
-function compile () {
-  const tsResult = tsProject.src()
-    .pipe(tsProject());
-  return tsResult.js.pipe(dest('build'));
-}
-
-async function installDependencies () {
-  src([ 'package*.json' ]).pipe(dest('build'));
-  await exec('npm ci --only=prod', {
-    cwd: path.resolve(__dirname, 'build'),
-  });
+async function bundle () {
+  const bundle = await rollup.rollup(bundleConfig);
+  await bundle.write(outputConfig);
 }
 
 function package () {
@@ -59,9 +47,5 @@ async function publish () {
 }
 
 module.exports = {
-  default: series(installDependencies, compile, package, publish),
-  compile,
-  installDependencies,
-  package,
-  publish,
+  default: series(bundle, package, publish),
 };

@@ -1,0 +1,8 @@
+{
+  "@opnprd/generator-js": {
+    "promptValues": {
+      "entrypoint": "lambda",
+      "destination": "dist"
+    }
+  }
+}

@@ -2,17 +2,26 @@
   "private": true,
   "scripts": {
     "check": "aws cloudformation validate-template --template-body \"file://${PWD}/election-app.yaml\"",
-    "deploy": "aws cloudformation deploy --template-file \"./election-app.yaml\" --stack-name odileeds-uk-election-2019 --s3-bucket odileeds-code-staging --force-upload --s3-prefix election-2019 --capabilities CAPABILITY_NAMED_IAM"
+    "deploy": "aws cloudformation deploy --template-file \"./election-app.yaml\" --stack-name odileeds-uk-election-2019 --s3-bucket odileeds-code-staging --force-upload --s3-prefix election-2019 --capabilities CAPABILITY_NAMED_IAM",
+    "bundle": "rollup --config rollup.config.js"
   },
   "devDependencies": {
+    "@babel/core": "^7.6.2",
+    "@babel/preset-env": "^7.6.2",
+    "@rollup/plugin-json": "^4.0.0",
+    "@rollup/plugin-node-resolve": "^6.0.0",
+    "@rollup/plugin-typescript": "^2.0.0",
     "@types/node": "^12.12.11",
     "aws-sdk": "^2.577.0",
     "gulp": "^4.0.2",
-    "gulp-typescript": "^6.0.0-alpha.1",
     "gulp-zip": "^5.0.1",
+    "rollup": "^1.22.0",
+    "rollup-plugin-babel": "^4.3.3",
+    "rollup-plugin-commonjs": "^10.1.0",
+    "tslib": "^1.10.0",
     "typescript": "^3.7.2"
   },
   "dependencies": {
-    "rss": "^1.2.2"
+    "feed": "^4.0.0"
   }
 }
