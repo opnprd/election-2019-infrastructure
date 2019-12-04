@@ -32,7 +32,8 @@ function batcher(acc, current: any, index: number) : any[] {
 }
 
 export async function enrich(event, context) {
-  console.dir(event, context);
+  const { s3: { bucket: { name }, object: { key } } } = event;
+  console.dir({ name, key });
   const resultFiles = await s3.getObjectList({
     bucket: bucketName,
     path: bucketPath,
