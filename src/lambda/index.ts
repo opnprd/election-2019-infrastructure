@@ -10,16 +10,11 @@ const atomFeed = outputBucketPath + 'feed.atom';
 const rssFeed = outputBucketPath + 'feed.rss';
 
 function buildProcessor(key: string) {
-  return async () : Promise<[string, string]> => {
+  return async () => {
     const filename = basename(key);
     const resultSet = await s3.getObjectContents({ bucket: bucketName, path: key }).then(JSON.parse);
     // Reshape and add reference
-    const { id, elections: { 2019: { candidates } }, events: [ summary ] } = resultSet;
-    const feedItem = { date: new Date(summary.date), link, title: summary.message };
-    feed.addItem(feedItem);
-    const winner = candidates.sort((a,b) => b.votes - a.votes)[0].party.code;
     await s3.putObjectContents({ bucket: bucketName, path: outputBucketPath + filename }, JSON.stringify(resultSet), { acl: 'public-read', contentType: 'application/json' });
-    return [ id, winner ];
   }
 }
 
@@ -32,23 +27,10 @@ function batcher(acc, current: any, index: number) : any[] {
 }
 
 export async function enrich(event, context) {
-  const objects = event.Records.map(r => ({ bucket: r.s3.bucket.name, key: r.s3.object.key }));
-  console.dir(objects);
-  const resultFiles = await s3.getObjectList({
-    bucket: bucketName,
-    path: bucketPath,
-  })
-  const processors = resultFiles.map(buildProcessor).reduce(batcher, []);
-  const results = [[ 'ccode', 'first19' ]];
+  const objects = event.Records.map(r => r.s3.object.key );
+  const processors = objects.map(buildProcessor).reduce(batcher, []);
   while (processors.length) {
     const batch = processors.shift();
-    const result : string[][] = await Promise.all(batch.map(x => x()))
-    results.push(...result);
+    await Promise.all(batch.map(x => x()))
   }
-  const summaryCsv = results.map(x => x.join(',')).join('\n');
-  await Promise.all([
-    s3.putObjectContents({ bucket: bucketName, path: summaryFile }, summaryCsv, { acl: 'public-read', contentType: 'text/csv' }),
-    s3.putObjectContents({ bucket: bucketName, path: rssFeed}, feed.rss2(), { acl: 'public-read', contentType: 'application/rss+xml' }),
-    s3.putObjectContents({ bucket: bucketName, path: atomFeed}, feed.atom1(), { acl: 'public-read', contentType: 'application/atom+xml' }),
-  ]);
 }
