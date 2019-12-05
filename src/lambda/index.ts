@@ -4,7 +4,10 @@ import feed, { link } from './lib/rss';
 
 const bucketName = 'odileeds-uk-election-2019';
 const bucketPath = 'public/results/';
-const outputBucketPath = 'processed/';
+
+const dataEnvironment = process.env.DATA_PATH || 'develop';
+
+const outputBucketPath = `processed/${dataEnvironment}/`;
 const summaryFile = outputBucketPath + '2019-results.csv';
 const atomFeed = outputBucketPath + 'feed.atom';
 const rssFeed = outputBucketPath + 'feed.rss';
