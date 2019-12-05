@@ -139,3 +139,36 @@ Resources:
       Environment:
         Variables: 
           DATA_PATH: 'test'
+
+  DataSummaryFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code:
+        S3Bucket: odileeds-code-staging
+        S3Key: election-2019/lambda.zip
+        S3ObjectVersion: !Ref CodeVersion
+      Description: Summarising Election Results data
+      Handler: lambda.summarise
+      Role: !GetAtt DataProcessor.Arn
+      Runtime: nodejs12.x
+
+  SummariseSchedule: 
+    Type: AWS::Events::Rule
+    Properties: 
+      Description: "ScheduledRule"
+      ScheduleExpression: "rate(30 seconds)"
+      State: "DISABLED"
+      Targets:
+        - Arn: !GetAtt DataSummaryFunction.Arn
+          Id: "TargetFunctionV1"
+  PermissionForEventsToInvokeLambda: 
+    Type: AWS::Lambda::Permission
+    Properties: 
+      FunctionName: 
+        Ref: "DataSummaryFunction"
+      Action: "lambda:InvokeFunction"
+      Principal: "events.amazonaws.com"
+      SourceArn: 
+        Fn::GetAtt: 
+          - "SummariseSchedule"
+          - "Arn"
