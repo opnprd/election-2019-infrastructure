@@ -17,7 +17,11 @@ function buildProcessor(key: string) {
   return async () : Promise<[string, string]> => {
     const filename = basename(key);
     const resultSet = await s3.getObjectContents({ bucket: bucketName, path: key }).then(JSON.parse);
-    const { id, name, candidates,
+    const {
+      id,
+      name,
+      candidates,
+      winner,
       events: [ summary ],
       votes: {
         margin,
@@ -30,7 +34,6 @@ function buildProcessor(key: string) {
     const lastElection = Object.keys(priorElection).sort().reverse()[0];
     const mostRecentWinner = priorElection[lastElection].party.code;
     const incumbent = (mostRecentWinner === resultSet.incumbent.party.code) ? resultSet.incumbent : undefined;
-    const winner = candidates.sort((a, b) => b.votes - a.votes)[0];
 
     const turnout = { value: valid, pc: undefined };
     if (electorate) turnout.pc = parseFloat(((valid / electorate) * 100).toFixed(1));
