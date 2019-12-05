@@ -32,7 +32,7 @@ function buildProcessor(key: string) {
       id,
       title: name,
       elections: {
-        ...priorElection,
+        ...priorElection.elections,
         '2019-12-12': {
           type: 'general',
           mp: winner.name,
