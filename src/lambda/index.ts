@@ -1,6 +1,7 @@
 import { basename } from 'path';
 import * as s3 from './lib/s3';
-import feed, { link } from './lib/rss';
+import { feed, link } from './lib/rss';
+import electionData from './data/elections.json';
 
 const bucketName = 'odileeds-uk-election-2019';
 const bucketPath = 'public/results/';
@@ -25,11 +26,13 @@ function buildProcessor(key: string) {
         electorate
       }
     } = resultSet;
+    const priorElection = electionData.find(x => x.id === id);
     const winner = candidates.sort((a,b) => b.votes - a.votes)[0];
     const output = {
       id,
       title: name,
       elections: {
+        ...priorElection,
         '2019-12-12': {
           type: 'general',
           mp: winner.name,

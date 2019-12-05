@@ -49,4 +49,5 @@ async function publish () {
 
 module.exports = {
   default: series(bundle, package, publish),
+  bundle,
 };
