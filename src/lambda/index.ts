@@ -13,8 +13,8 @@ function buildProcessor(key: string) {
   return async () : Promise<[string, string]> => {
     const filename = basename(key);
     const resultSet = await s3.getObjectContents({ bucket: bucketName, path: key }).then(JSON.parse);
-    // Reshape and add reference
-    const { id, elections: { 2019: { candidates } }, events: [ summary ] } = resultSet;
+    // TODO: Reshape and add reference
+    const { id, candidates, events: [ summary ] } = resultSet;
     const feedItem = { date: new Date(summary.date), link, title: summary.message };
     feed.addItem(feedItem);
     const winner = candidates.sort((a,b) => b.votes - a.votes)[0].party.code;
