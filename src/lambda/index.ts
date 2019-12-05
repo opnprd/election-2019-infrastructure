@@ -31,6 +31,7 @@ function buildProcessor(key: string) {
       title: name,
       elections: {
         '2019-12-12': {
+          type: 'general',
           mp: winner.name,
           party: winner.party,
           margin, valid, invalid, electorate,
