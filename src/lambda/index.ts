@@ -16,7 +16,7 @@ function buildProcessor(key: string) {
   return async () : Promise<[string, string]> => {
     const filename = basename(key);
     const resultSet = await s3.getObjectContents({ bucket: bucketName, path: key }).then(JSON.parse);
-    const { id, name, candidates,
+    const { id, name, candidates, incumbent,
       events: [ summary ],
       votes: {
         margin,
@@ -29,11 +29,14 @@ function buildProcessor(key: string) {
     const output = {
       id,
       title: name,
-      mp: winner.name,
-      party: winner.party,
-      margin, valid, invalid, electorate,
       elections: {
-        '2019-12-12': candidates,
+        '2019-12-12': {
+          mp: winner.name,
+          party: winner.party,
+          margin, valid, invalid, electorate,
+          candidates,
+          incumbent,
+        },
       },
     };
     const feedItem = { date: new Date(summary.date), link, title: summary.message };
