@@ -16,13 +16,30 @@ function buildProcessor(key: string) {
   return async () : Promise<[string, string]> => {
     const filename = basename(key);
     const resultSet = await s3.getObjectContents({ bucket: bucketName, path: key }).then(JSON.parse);
-    // TODO: Reshape and add reference
-    const { id, candidates, events: [ summary ] } = resultSet;
+    const { id, name, candidates,
+      events: [ summary ],
+      votes: {
+        margin,
+        invalid,
+        valid,
+        electorate
+      }
+    } = resultSet;
+    const winner = candidates.sort((a,b) => b.votes - a.votes)[0];
+    const output = {
+      id,
+      title: name,
+      mp: winner.name,
+      party: winner.party,
+      margin, valid, invalid, electorate,
+      election: {
+        '2019-12-12': candidates,
+      },
+    };
     const feedItem = { date: new Date(summary.date), link, title: summary.message };
     feed.addItem(feedItem);
-    const winner = candidates.sort((a,b) => b.votes - a.votes)[0].party.code;
-    await s3.putObjectContents({ bucket: bucketName, path: outputBucketPath + filename }, JSON.stringify(resultSet), { acl: 'public-read', contentType: 'application/json' });
-    return [ id, winner ];
+    await s3.putObjectContents({ bucket: bucketName, path: outputBucketPath + filename }, JSON.stringify(output), { acl: 'public-read', contentType: 'application/json' });
+    return [ id, winner.party.code ];
   }
 }
 
