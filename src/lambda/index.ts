@@ -21,7 +21,10 @@ function buildProcessor(key: string) {
       id,
       name,
       candidates,
-      winner,
+      winner: {
+        name: mp,
+        party,
+      } = {},
       events: [ summary ],
       votes: {
         margin,
@@ -46,8 +49,8 @@ function buildProcessor(key: string) {
         ...priorElection,
         '2019-12-12': {
           type: 'general',
-          mp: winner.name,
-          party: winner.party,
+          mp,
+          party,
           majority: margin,
           valid,
           turnout,
@@ -61,7 +64,7 @@ function buildProcessor(key: string) {
     const feedItem = { date: new Date(summary.date), link, title: summary.message };
     feed.addItem(feedItem);
     await s3.putObjectContents({ bucket: bucketName, path: outputBucketPath + filename }, JSON.stringify(output), { acl: 'public-read', contentType: 'application/json' });
-    return [ id, winner.party.code ];
+    return [ id, party.code ];
   }
 }
 
