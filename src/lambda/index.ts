@@ -30,11 +30,11 @@ function buildProcessor(key: string) {
     const lastElection = Object.keys(priorElection).sort().reverse()[0];
     const mostRecentWinner = priorElection[lastElection].party.code;
     const incumbent = (mostRecentWinner === resultSet.incumbent.party.code) ? resultSet.incumbent : undefined;
-    const winner = candidates.sort((a,b) => b.votes - a.votes)[0];
-    const turnout = {
-      value: valid,
-      pc: ((valid / electorate) * 100).toFixed(1),
-    }
+    const winner = candidates.sort((a, b) => b.votes - a.votes)[0];
+
+    const turnout = { value: valid, pc: undefined };
+    if (electorate) turnout.pc = parseFloat(((valid / electorate) * 100).toFixed(1));
+
     const output = {
       id,
       title: name,
