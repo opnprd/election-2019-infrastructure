@@ -32,7 +32,7 @@ function buildProcessor(key: string) {
       mp: winner.name,
       party: winner.party,
       margin, valid, invalid, electorate,
-      election: {
+      elections: {
         '2019-12-12': candidates,
       },
     };
