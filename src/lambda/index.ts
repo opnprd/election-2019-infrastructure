@@ -22,8 +22,8 @@ function buildProcessor(key: string) {
       name,
       candidates,
       winner: {
-        name: mp,
-        party,
+        name: mp = undefined,
+        party = {},
       } = {},
       events: [ summary ],
       votes: {
