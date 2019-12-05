@@ -23,7 +23,7 @@ function buildProcessor(key: string) {
         margin,
         invalid,
         valid,
-        electorate
+        electorate,
       }
     } = resultSet;
     const priorElection = electionData.find(x => x.id === id).elections;
@@ -31,6 +31,10 @@ function buildProcessor(key: string) {
     const mostRecentWinner = priorElection[lastElection].party.code;
     const incumbent = (mostRecentWinner === resultSet.incumbent.party.code) ? resultSet.incumbent : undefined;
     const winner = candidates.sort((a,b) => b.votes - a.votes)[0];
+    const turnout = {
+      value: valid,
+      pc: ((valid / electorate) * 100).toFixed(1),
+    }
     const output = {
       id,
       title: name,
@@ -40,7 +44,11 @@ function buildProcessor(key: string) {
           type: 'general',
           mp: winner.name,
           party: winner.party,
-          margin, valid, invalid, electorate,
+          majority: margin,
+          valid,
+          turnout,
+          invalid,
+          electorate,
           candidates,
           incumbent,
         },
