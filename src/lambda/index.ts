@@ -17,7 +17,7 @@ function buildProcessor(key: string) {
   return async () : Promise<[string, string]> => {
     const filename = basename(key);
     const resultSet = await s3.getObjectContents({ bucket: bucketName, path: key }).then(JSON.parse);
-    const { id, name, candidates, incumbent,
+    const { id, name, candidates,
       events: [ summary ],
       votes: {
         margin,
@@ -26,13 +26,16 @@ function buildProcessor(key: string) {
         electorate
       }
     } = resultSet;
-    const priorElection = electionData.find(x => x.id === id);
+    const priorElection = electionData.find(x => x.id === id).elections;
+    const lastElection = Object.keys(priorElection).sort().reverse()[0];
+    const mostRecentWinner = priorElection[lastElection].party.code;
+    const incumbent = (mostRecentWinner === resultSet.incumbent.party.code) ? resultSet.incumbent : undefined;
     const winner = candidates.sort((a,b) => b.votes - a.votes)[0];
     const output = {
       id,
       title: name,
       elections: {
-        ...priorElection.elections,
+        ...priorElection,
         '2019-12-12': {
           type: 'general',
           mp: winner.name,
