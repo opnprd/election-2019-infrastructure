@@ -34,7 +34,7 @@ function buildProcessor(key: string) {
         electorate,
       }
     } = resultSet;
-    const priorElection = electionData.find(x => x.id === id).elections;
+    const { demographics, elections: priorElection } = electionData.find(x => x.id === id);
     const lastElection = Object.keys(priorElection).sort().reverse()[0];
     const mostRecentWinner = priorElection[lastElection].party.code;
     const incumbent = (mostRecentWinner === resultSet.incumbent.party.code) ? undefined : resultSet.incumbent;
@@ -45,6 +45,7 @@ function buildProcessor(key: string) {
     const output = {
       id,
       title: name,
+      demographics,
       elections: {
         ...priorElection,
         '2019-12-12': {
@@ -61,8 +62,8 @@ function buildProcessor(key: string) {
         },
       },
     };
-    const feedItem = { date: new Date(summary.date), link, title: summary.message };
-    feed.addItem(feedItem);
+    // const feedItem = { date: new Date(summary.date), link, title: summary.message };
+    // feed.addItem(feedItem);
     await s3.putObjectContents({ bucket: bucketName, path: outputBucketPath + filename }, JSON.stringify(output), { acl: 'public-read', contentType: 'application/json' });
     return [ id, party.code ];
   }
