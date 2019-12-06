@@ -1,6 +1,7 @@
 import { basename } from 'path';
 import * as s3 from './lib/s3';
 import { feed, link } from './lib/rss';
+import batcher from './lib/batcher';
 import electionData from './data/elections.json';
 
 const bucketName = 'odileeds-uk-election-2019';
@@ -65,14 +66,6 @@ function buildProcessor(key: string) {
     await s3.putObjectContents({ bucket: bucketName, path: outputBucketPath + filename }, JSON.stringify(output), { acl: 'public-read', contentType: 'application/json' });
     return [ id, party.code ];
   }
-}
-
-function batcher(acc, current: any, index: number) : any[] {
-  const batch = Math.floor(index/10);
-  acc.length = batch + 1;
-  if (!Array.isArray(acc[batch])) acc[batch] = [];
-  acc[batch] = [ ...acc[batch], current ];
-  return acc;
 }
 
 export async function enrich(event, context) {
