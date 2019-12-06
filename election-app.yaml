@@ -156,7 +156,7 @@ Resources:
     Type: AWS::Events::Rule
     Properties: 
       Description: "ScheduledRule"
-      ScheduleExpression: "rate(30 seconds)"
+      ScheduleExpression: "rate(1 minute)"
       State: "DISABLED"
       Targets:
         - Arn: !GetAtt DataSummaryFunction.Arn
