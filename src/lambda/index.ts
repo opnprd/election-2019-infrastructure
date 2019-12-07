@@ -4,7 +4,7 @@ import { feed, link } from './lib/rss';
 import batcher from './lib/batcher';
 import electionData from './data/elections.json';
 
-import { resultReader } from './process';
+import { resultReader, getSummary } from './process';
 import { bucketName, bucketPath, outputBucketPath, summaryFile } from './config';
 
 function buildProcessor(key: string) {
@@ -89,7 +89,8 @@ export async function summarise(event, context) {
     bucket: bucketName,
     path: bucketPath,
   });
-  const processors = resultFiles.map(resultReader).reduce(batcher, []);
+  // const processors = resultFiles.map(resultReader).reduce(batcher, []);
+  const processors = resultFiles.map(getSummary).reduce(batcher, []);
   const results = [[ 'ccode', 'first19' ]];
   while (processors.length) {
     const batch = processors.shift();
