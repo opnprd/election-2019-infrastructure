@@ -44,6 +44,7 @@ export async function runQuery(params) {
     InputSerialization: { JSON: { Type: 'DOCUMENT' } },
     OutputSerialization: { JSON: {} },
   }).promise();
+  console.dir(object);
   return object.Payload[0];
 }
 
