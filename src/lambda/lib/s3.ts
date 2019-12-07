@@ -31,7 +31,7 @@ export async function getObjectContents(params: s3Location) {
     Bucket: bucket,
     Key: path,    
   }).promise();
-  return JSON.parse(object.Body.toString('utf-8'));
+  return object.Body.toString('utf-8');
 }
 
 export async function runQuery(params) {

@@ -15,7 +15,7 @@ export function getSummary(key: string) {
 
 export function resultReader(key: string) {
   return async () : Promise<[string, string]> => {
-    const resultSet = await s3.getObjectContents({ bucket: bucketName, path: key });
+    const resultSet = await s3.getObjectContents({ bucket: bucketName, path: key }).then(JSON.parse);
     const { id, winner: { party = {}} = {}} = resultSet;
     return [ id, party.code ];
   }
