@@ -139,6 +139,7 @@ Resources:
       Environment:
         Variables: 
           DATA_PATH: 'test'
+          BATCH_SIZE: 10
 
   DataSummaryFunction:
     Type: AWS::Lambda::Function
@@ -151,6 +152,10 @@ Resources:
       Handler: lambda.summarise
       Role: !GetAtt DataProcessor.Arn
       Runtime: nodejs12.x
+      Environment:
+        Variables: 
+          DATA_PATH: 'test'
+          BATCH_SIZE: 10
 
   SummariseSchedule: 
     Type: AWS::Events::Rule

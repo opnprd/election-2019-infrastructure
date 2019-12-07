@@ -1,4 +1,4 @@
-const batchSize = 1;
+const batchSize = parseInt(process.env.BATCH_SIZE);
 export default function batcher(acc, current: any, index: number) : any[] {
   const batch = Math.floor(index/batchSize);
   acc.length = batch + 1;
