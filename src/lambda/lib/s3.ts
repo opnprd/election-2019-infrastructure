@@ -29,9 +29,22 @@ export async function getObjectContents(params: s3Location) {
   const { bucket, path } = params;
   const object = await s3.getObject({
     Bucket: bucket,
-    Key: path,
+    Key: path,    
   }).promise();
-  return object.Body.toString('utf-8');
+  return JSON.parse(object.Body.toString('utf-8'));
+}
+
+export async function runQuery(params) {
+  const { bucket, path, expression } = params;
+  const object = await s3.selectObjectContent({
+    Bucket: bucket,
+    Key: path,
+    Expression: expression,
+    ExpressionType: 'SQL',
+    InputSerialization: { JSON: { Type: 'DOCUMENT' } },
+    OutputSerialization: {}
+  }).promise();
+  return object.Payload[0];
 }
 
 interface putOptions {

@@ -4,15 +4,8 @@ import { feed, link } from './lib/rss';
 import batcher from './lib/batcher';
 import electionData from './data/elections.json';
 
-const bucketName = 'odileeds-uk-election-2019';
-const bucketPath = 'public/results/';
-
-const dataEnvironment = process.env.DATA_PATH || 'develop';
-
-const outputBucketPath = `processed/${dataEnvironment}/`;
-const summaryFile = outputBucketPath + '2019-results.csv';
-const atomFeed = outputBucketPath + 'feed.atom';
-const rssFeed = outputBucketPath + 'feed.rss';
+import { resultReader } from './process';
+import { bucketName, bucketPath, outputBucketPath, summaryFile } from './config';
 
 function buildProcessor(key: string) {
   return async () : Promise<[string, string]> => {
@@ -86,20 +79,9 @@ export async function enrich(event, context) {
   const summaryCsv = results.map(x => x.join(',')).join('\n');
   await Promise.all([
     s3.putObjectContents({ bucket: bucketName, path: summaryFile }, summaryCsv, { acl: 'public-read', contentType: 'text/csv' }),
-    s3.putObjectContents({ bucket: bucketName, path: rssFeed}, feed.rss2(), { acl: 'public-read', contentType: 'application/rss+xml' }),
-    s3.putObjectContents({ bucket: bucketName, path: atomFeed}, feed.atom1(), { acl: 'public-read', contentType: 'application/atom+xml' }),
+    // s3.putObjectContents({ bucket: bucketName, path: rssFeed}, feed.rss2(), { acl: 'public-read', contentType: 'application/rss+xml' }),
+    // s3.putObjectContents({ bucket: bucketName, path: atomFeed}, feed.atom1(), { acl: 'public-read', contentType: 'application/atom+xml' }),
   ]);
-}
-
-function resultReader(key: string) {
-  return async () : Promise<[string, string]> => {
-    const resultSet = await s3.getObjectContents({ bucket: bucketName, path: key }).then(JSON.parse);
-    const { id, winner: { party = {}} = {}} = resultSet;
-    // const feedItem = { date: new Date(summary.date), link, title: summary.message };
-    // feed.addItem(feedItem);
-    // const winner = candidates.sort((a,b) => b.votes - a.votes)[0].party.code;
-    return [ id, party.code ];
-  }
 }
 
 export async function summarise(event, context) {
@@ -117,7 +99,7 @@ export async function summarise(event, context) {
   const summaryCsv = results.map(x => x.join(',')).join('\n');
   await Promise.all([
     s3.putObjectContents({ bucket: bucketName, path: summaryFile }, summaryCsv, { acl: 'public-read', contentType: 'text/csv' }),
-    s3.putObjectContents({ bucket: bucketName, path: rssFeed}, feed.rss2(), { acl: 'public-read', contentType: 'application/rss+xml' }),
-    s3.putObjectContents({ bucket: bucketName, path: atomFeed}, feed.atom1(), { acl: 'public-read', contentType: 'application/atom+xml' }),
+    // s3.putObjectContents({ bucket: bucketName, path: rssFeed}, feed.rss2(), { acl: 'public-read', contentType: 'application/rss+xml' }),
+    // s3.putObjectContents({ bucket: bucketName, path: atomFeed}, feed.atom1(), { acl: 'public-read', contentType: 'application/atom+xml' }),
   ]);
 }
