@@ -89,8 +89,8 @@ export async function summarise(event, context) {
     bucket: bucketName,
     path: bucketPath,
   });
-  // const processors = resultFiles.map(resultReader).reduce(batcher, []);
-  const processors = resultFiles.map(getSummary).reduce(batcher, []);
+  const processors = resultFiles.map(resultReader).reduce(batcher, []);
+  // const processors = resultFiles.map(getSummary).reduce(batcher, []);
   const results = [[ 'ccode', 'first19' ]];
   while (processors.length) {
     const batch = processors.shift();
