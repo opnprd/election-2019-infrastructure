@@ -42,7 +42,7 @@ export async function runQuery(params) {
     Expression: expression,
     ExpressionType: 'SQL',
     InputSerialization: { JSON: { Type: 'DOCUMENT' } },
-    OutputSerialization: {}
+    OutputSerialization: { JSON: {} },
   }).promise();
   return object.Payload[0];
 }
