@@ -36,7 +36,7 @@ export async function getObjectContents(params: s3Location) {
 
 export async function runQuery(params) {
   const { bucket, path, expression } = params;
-  const object = await s3.selectObjectContent({
+  const response = await s3.selectObjectContent({
     Bucket: bucket,
     Key: path,
     Expression: expression,
@@ -44,8 +44,15 @@ export async function runQuery(params) {
     InputSerialization: { JSON: { Type: 'DOCUMENT' } },
     OutputSerialization: { JSON: {} },
   }).promise();
-  console.dir(object);
-  return object.Payload[0];
+
+  const events = response.Payload;
+  const result = []
+  for await (const event of events) {
+    if (Object.prototype.hasOwnProperty.call(event, 'Records')) {
+      result.push(event.Records.Payload.toString('utf-8'));
+    }
+  }
+  return JSON.parse(result.join(''));
 }
 
 interface putOptions {
