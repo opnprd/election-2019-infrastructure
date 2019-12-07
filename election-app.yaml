@@ -6,6 +6,12 @@ Parameters:
     Default: odileeds-uk-election-2019
   CodeVersion:
     Type: String
+  DataPath:
+    Type: String
+    Default: Test
+  BatchSize:
+    Type: String
+    Default: 100
 Resources:
   ElectionData:
     Type: AWS::S3::Bucket
@@ -138,8 +144,8 @@ Resources:
       Runtime: nodejs12.x
       Environment:
         Variables: 
-          DATA_PATH: 'test'
-          BATCH_SIZE: 10
+          DATA_PATH: !Ref DataPath
+          BATCH_SIZE: !Ref BatchSize
 
   DataSummaryFunction:
     Type: AWS::Lambda::Function
@@ -154,8 +160,8 @@ Resources:
       Runtime: nodejs12.x
       Environment:
         Variables: 
-          DATA_PATH: 'test'
-          BATCH_SIZE: 10
+          DATA_PATH: !Ref DataPath
+          BATCH_SIZE: !Ref BatchSize
 
   SummariseSchedule: 
     Type: AWS::Events::Rule
