@@ -8,7 +8,7 @@ Parameters:
     Type: String
   DataPath:
     Type: String
-    Default: Test
+    Default: test
   BatchSize:
     Type: String
     Default: 100
@@ -146,6 +146,7 @@ Resources:
         Variables: 
           DATA_PATH: !Ref DataPath
           BATCH_SIZE: !Ref BatchSize
+      Timeout: 120
 
   DataSummaryFunction:
     Type: AWS::Lambda::Function
@@ -162,6 +163,7 @@ Resources:
         Variables: 
           DATA_PATH: !Ref DataPath
           BATCH_SIZE: !Ref BatchSize
+      Timeout: 120
 
   SummariseSchedule: 
     Type: AWS::Events::Rule
