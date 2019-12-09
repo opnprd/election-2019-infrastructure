@@ -64,7 +64,7 @@ function buildProcessor(key: string) {
 
 export async function enrich(event, context) {
   const objects = event.Records.map(r => ({ bucket: r.s3.bucket.name, key: r.s3.object.key }));
-  const processors = objects.map(buildProcessor);
+  const processors = objects.map(o => buildProcessor(o.key));
   await Promise.all(processors.map(x => x()));
 }
 
