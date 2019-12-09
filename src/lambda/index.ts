@@ -64,24 +64,8 @@ function buildProcessor(key: string) {
 
 export async function enrich(event, context) {
   const objects = event.Records.map(r => ({ bucket: r.s3.bucket.name, key: r.s3.object.key }));
-  console.dir(objects);
-  const resultFiles = await s3.getObjectList({
-    bucket: bucketName,
-    path: bucketPath,
-  })
-  const processors = resultFiles.map(buildProcessor).reduce(batcher, []);
-  const results = [[ 'ccode', 'first19' ]];
-  while (processors.length) {
-    const batch = processors.shift();
-    const result : string[][] = await Promise.all(batch.map(x => x()))
-    results.push(...result);
-  }
-  const summaryCsv = results.map(x => x.join(',')).join('\n');
-  await Promise.all([
-    s3.putObjectContents({ bucket: bucketName, path: summaryFile }, summaryCsv, { acl: 'public-read', contentType: 'text/csv' }),
-    // s3.putObjectContents({ bucket: bucketName, path: rssFeed}, feed.rss2(), { acl: 'public-read', contentType: 'application/rss+xml' }),
-    // s3.putObjectContents({ bucket: bucketName, path: atomFeed}, feed.atom1(), { acl: 'public-read', contentType: 'application/atom+xml' }),
-  ]);
+  const processors = objects.map(buildProcessor);
+  await Promise.all(processors.map(x => x()));
 }
 
 export async function summarise(event, context) {
