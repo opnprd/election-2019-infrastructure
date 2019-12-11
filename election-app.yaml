@@ -12,6 +12,9 @@ Parameters:
   BatchSize:
     Type: String
     Default: 100
+  BatchTimeout:
+    Type: String
+    Default: 600
 Resources:
   ElectionData:
     Type: AWS::S3::Bucket
@@ -148,6 +151,23 @@ Resources:
           BATCH_SIZE: !Ref BatchSize
       Timeout: 2
 
+  DataBatchProcessingFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code:
+        S3Bucket: odileeds-code-staging
+        S3Key: election-2019/lambda.zip
+        S3ObjectVersion: !Ref CodeVersion
+      Description: Processing Election Results data
+      Handler: lambda.batchEnrich
+      Role: !GetAtt DataProcessor.Arn
+      Runtime: nodejs12.x
+      Environment:
+        Variables: 
+          DATA_PATH: !Ref DataPath
+          BATCH_SIZE: !Ref BatchSize
+      Timeout: !Ref BatchTimeout
+
   DataSummaryFunction:
     Type: AWS::Lambda::Function
     Properties:
@@ -163,7 +183,7 @@ Resources:
         Variables: 
           DATA_PATH: !Ref DataPath
           BATCH_SIZE: !Ref BatchSize
-      Timeout: 600
+      Timeout: !Ref BatchTimeout
 
   SummariseSchedule: 
     Type: AWS::Events::Rule

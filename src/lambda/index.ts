@@ -4,8 +4,12 @@ import { feed, link } from './lib/rss';
 import batcher from './lib/batcher';
 import electionData from './data/elections.json';
 
-import { resultReader, getSummary } from './process';
+import { resultReader } from './process';
 import { bucketName, bucketPath, outputBucketPath, summaryFile } from './config';
+
+async function getAllResultFiles() {
+  return s3.getObjectList({ bucket: bucketName, path: bucketPath });
+}
 
 function buildProcessor(key: string) {
   return async () : Promise<[string, string]> => {
@@ -15,17 +19,9 @@ function buildProcessor(key: string) {
       id,
       name,
       candidates,
-      winner: {
-        name: mp = undefined,
-        party = {},
-      } = {},
+      winner: { name: mp = undefined, party = {} } = {},
       events,
-      votes: {
-        margin,
-        invalid,
-        valid,
-        electorate,
-      }
+      votes: { margin, invalid, valid, electorate }
     } = resultSet;
     const { demographics, elections: priorElection } = electionData.find(x => x.id === id);
     const lastElection = Object.keys(priorElection).sort().reverse()[0];
@@ -69,13 +65,18 @@ export async function enrich(event, context) {
   await Promise.all(processors.map(x => x()));
 }
 
+export async function batchEnrich(event, context) {
+  const resultFiles = await getAllResultFiles();
+  const processors = resultFiles.map(buildProcessor).reduce(batcher, []);
+  while (processors.length) {
+    const batch = processors.shift();
+    await Promise.all(batch.map(x => x()));
+  }
+}
+
 export async function summarise(event, context) {
-  const resultFiles = await s3.getObjectList({
-    bucket: bucketName,
-    path: bucketPath,
-  });
+  const resultFiles = await getAllResultFiles();
   const processors = resultFiles.map(resultReader).reduce(batcher, []);
-  // const processors = resultFiles.map(getSummary).reduce(batcher, []);
   const results = [[ 'ccode', 'first19' ]];
   while (processors.length) {
     const batch = processors.shift();
