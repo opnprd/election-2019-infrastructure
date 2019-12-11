@@ -146,7 +146,7 @@ Resources:
         Variables: 
           DATA_PATH: !Ref DataPath
           BATCH_SIZE: !Ref BatchSize
-      Timeout: 120
+      Timeout: 2
 
   DataSummaryFunction:
     Type: AWS::Lambda::Function
@@ -163,7 +163,7 @@ Resources:
         Variables: 
           DATA_PATH: !Ref DataPath
           BATCH_SIZE: !Ref BatchSize
-      Timeout: 120
+      Timeout: 600
 
   SummariseSchedule: 
     Type: AWS::Events::Rule

@@ -19,7 +19,7 @@ function buildProcessor(key: string) {
         name: mp = undefined,
         party = {},
       } = {},
-      events: [ summary ],
+      events,
       votes: {
         margin,
         invalid,
@@ -54,6 +54,7 @@ function buildProcessor(key: string) {
           incumbent,
         },
       },
+      events,
     };
     // const feedItem = { date: new Date(summary.date), link, title: summary.message };
     // feed.addItem(feedItem);
