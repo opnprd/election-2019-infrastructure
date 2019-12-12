@@ -8,7 +8,7 @@ Parameters:
     Type: String
   DataPath:
     Type: String
-    Default: test
+    Default: "live"
   BatchSize:
     Type: String
     Default: 100
