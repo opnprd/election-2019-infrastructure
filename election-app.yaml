@@ -15,7 +15,11 @@ Parameters:
   BatchTimeout:
     Type: String
     Default: 600
+
 Resources:
+
+# S3 Bucket
+
   ElectionData:
     Type: AWS::S3::Bucket
     DeletionPolicy: Retain
@@ -33,6 +37,15 @@ Resources:
                   - Name: suffix
                     Value: .json
             Function: !GetAtt DataProcessingFunction.Arn
+          - Event: 's3:ObjectCreated:*'
+            Filter:
+              S3Key: 
+                Rules:
+                  - Name: prefix
+                    Value: public/results/
+                  - Name: suffix
+                    Value: .json
+            Function: !GetAtt DataSummaryFunction.Arn
       PublicAccessBlockConfiguration:
         BlockPublicAcls: false
         BlockPublicPolicy: true
@@ -46,11 +59,21 @@ Resources:
           ExposedHeaders: [x-amz-server-side-encryption, x-amz-request-id, x-amz-id-2, ETag]
           AllowedHeaders: ['*']
           Id: amplifyAccess
+
+# Trigger permissions
+
   TriggerDataProcessingPermission:
     Type: AWS::Lambda::Permission
     Properties:
       Action: lambda:InvokeFunction
       FunctionName: !Ref DataProcessingFunction
+      Principal: s3.amazonaws.com
+      SourceArn: !Sub arn:aws:s3:::${BucketName}
+  TriggerDataSummaryPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !Ref DataSummaryFunction
       Principal: s3.amazonaws.com
       SourceArn: !Sub arn:aws:s3:::${BucketName}
 
@@ -134,6 +157,9 @@ Resources:
               - 's3:PutObject'
               - 's3:PutObjectAcl'
             Resource: !Join ['/', [!GetAtt ElectionData.Arn, 'processed', '*']]
+
+# LAMBDA FUNCTIONS
+
   DataProcessingFunction:
     Type: AWS::Lambda::Function
     Properties:
@@ -151,23 +177,6 @@ Resources:
           BATCH_SIZE: !Ref BatchSize
       Timeout: 2
 
-  DataBatchProcessingFunction:
-    Type: AWS::Lambda::Function
-    Properties:
-      Code:
-        S3Bucket: odileeds-code-staging
-        S3Key: election-2019/lambda.zip
-        S3ObjectVersion: !Ref CodeVersion
-      Description: Processing Election Results data
-      Handler: lambda.batchEnrich
-      Role: !GetAtt DataProcessor.Arn
-      Runtime: nodejs12.x
-      Environment:
-        Variables: 
-          DATA_PATH: !Ref DataPath
-          BATCH_SIZE: !Ref BatchSize
-      Timeout: !Ref BatchTimeout
-
   DataSummaryFunction:
     Type: AWS::Lambda::Function
     Properties:
@@ -184,24 +193,3 @@ Resources:
           DATA_PATH: !Ref DataPath
           BATCH_SIZE: !Ref BatchSize
       Timeout: !Ref BatchTimeout
-
-  SummariseSchedule: 
-    Type: AWS::Events::Rule
-    Properties: 
-      Description: "ScheduledRule"
-      ScheduleExpression: "rate(1 minute)"
-      State: "DISABLED"
-      Targets:
-        - Arn: !GetAtt DataSummaryFunction.Arn
-          Id: "TargetFunctionV1"
-  PermissionForEventsToInvokeLambda: 
-    Type: AWS::Lambda::Permission
-    Properties: 
-      FunctionName: 
-        Ref: "DataSummaryFunction"
-      Action: "lambda:InvokeFunction"
-      Principal: "events.amazonaws.com"
-      SourceArn: 
-        Fn::GetAtt: 
-          - "SummariseSchedule"
-          - "Arn"
