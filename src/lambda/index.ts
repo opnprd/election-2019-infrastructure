@@ -90,3 +90,10 @@ export async function summarise(event, context) {
     // s3.putObjectContents({ bucket: bucketName, path: atomFeed}, feed.atom1(), { acl: 'public-read', contentType: 'application/atom+xml' }),
   ]);
 }
+
+export async function enrichAndSummarise(event, context) {
+  await Promise.all([
+    batchEnrich(event, context),
+    summarise(event, context),
+  ]);
+}

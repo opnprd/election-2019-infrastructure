@@ -35,15 +35,6 @@ Resources:
                   - Name: suffix
                     Value: .json
             Function: !GetAtt DataProcessingFunction.Arn
-          - Event: 's3:ObjectCreated:*'
-            Filter:
-              S3Key: 
-                Rules:
-                  - Name: prefix
-                    Value: public/results/
-                  - Name: suffix
-                    Value: .json
-            Function: !GetAtt DataSummaryFunction.Arn
       PublicAccessBlockConfiguration:
         BlockPublicAcls: false
         BlockPublicPolicy: true
@@ -162,7 +153,7 @@ Resources:
         S3Key: election-2019/lambda.zip
         S3ObjectVersion: !Ref CodeVersion
       Description: Processing Election Results data
-      Handler: lambda.enrich
+      Handler: lambda.enrichAndSummarise
       Role: !GetAtt DataProcessor.Arn
       Runtime: nodejs12.x
       Environment:
@@ -170,20 +161,3 @@ Resources:
           DATA_PATH: !Ref DataPath
           BATCH_SIZE: !Ref BatchSize
       Timeout: 2
-
-  DataSummaryFunction:
-    Type: AWS::Lambda::Function
-    Properties:
-      Code:
-        S3Bucket: odileeds-code-staging
-        S3Key: election-2019/lambda.zip
-        S3ObjectVersion: !Ref CodeVersion
-      Description: Summarising Election Results data
-      Handler: lambda.summarise
-      Role: !GetAtt DataProcessor.Arn
-      Runtime: nodejs12.x
-      Environment:
-        Variables: 
-          DATA_PATH: !Ref DataPath
-          BATCH_SIZE: !Ref BatchSize
-      Timeout: !Ref BatchTimeout
