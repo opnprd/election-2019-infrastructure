@@ -56,13 +56,6 @@ Resources:
       FunctionName: !Ref DataProcessingFunction
       Principal: s3.amazonaws.com
       SourceArn: !Sub arn:aws:s3:::${BucketName}
-  TriggerDataSummaryPermission:
-    Type: AWS::Lambda::Permission
-    Properties:
-      Action: lambda:InvokeFunction
-      FunctionName: !Ref DataSummaryFunction
-      Principal: s3.amazonaws.com
-      SourceArn: !Sub arn:aws:s3:::${BucketName}
 
   DataCollectorRole:
     Type: AWS::IAM::Role
@@ -153,7 +146,7 @@ Resources:
         S3Key: election-2019/lambda.zip
         S3ObjectVersion: !Ref CodeVersion
       Description: Processing Election Results data
-      Handler: lambda.enrichAndSummarise
+      Handler: lambda.enrich
       Role: !GetAtt DataProcessor.Arn
       Runtime: nodejs12.x
       Environment:
