@@ -18,8 +18,6 @@ Parameters:
 
 Resources:
 
-# S3 Bucket
-
   ElectionData:
     Type: AWS::S3::Bucket
     DeletionPolicy: Retain
@@ -59,8 +57,6 @@ Resources:
           ExposedHeaders: [x-amz-server-side-encryption, x-amz-request-id, x-amz-id-2, ETag]
           AllowedHeaders: ['*']
           Id: amplifyAccess
-
-# Trigger permissions
 
   TriggerDataProcessingPermission:
     Type: AWS::Lambda::Permission
@@ -157,8 +153,6 @@ Resources:
               - 's3:PutObject'
               - 's3:PutObjectAcl'
             Resource: !Join ['/', [!GetAtt ElectionData.Arn, 'processed', '*']]
-
-# LAMBDA FUNCTIONS
 
   DataProcessingFunction:
     Type: AWS::Lambda::Function
