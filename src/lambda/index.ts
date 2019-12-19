@@ -12,6 +12,7 @@ async function getAllResultFiles() {
 }
 
 function buildProcessor(key: string) {
+  console.log(key);
   return async () : Promise<[string, string]> => {
     const filename = basename(key);
     const resultSet = await s3.getObjectContents({ bucket: bucketName, path: key }).then(JSON.parse);
