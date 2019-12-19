@@ -94,6 +94,7 @@ export async function summarise(event, context) {
 
 export async function enrichAndSummarise(event, context) {
   const resultFiles = await getAllResultFiles();
+  console.log(resultFiles);
   const processors = resultFiles.map(buildProcessor).reduce(batcher, []);
   const results = [[ 'ccode', 'first19' ]];
   while (processors.length) {
