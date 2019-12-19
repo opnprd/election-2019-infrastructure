@@ -92,8 +92,14 @@ export async function summarise(event, context) {
 }
 
 export async function enrichAndSummarise(event, context) {
-  await Promise.all([
-    batchEnrich(event, context),
-    summarise(event, context),
-  ]);
+  const resultFiles = await getAllResultFiles();
+  const processors = resultFiles.map(buildProcessor).reduce(batcher, []);
+  const results = [[ 'ccode', 'first19' ]];
+  while (processors.length) {
+    const batch = processors.shift();
+    const result : string[][] = await Promise.all(batch.map(x => x()));
+    results.push(...result);
+  }
+  const summaryCsv = results.map(x => x.join(',')).join('\n');
+  await s3.putObjectContents({ bucket: bucketName, path: summaryFile }, summaryCsv, { acl: 'public-read', contentType: 'text/csv' });
 }
