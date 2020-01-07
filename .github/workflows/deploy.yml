@@ -5,6 +5,7 @@ on:
       - master
 jobs:
   setup:
+    if: false
     runs-on: ubuntu-latest
     steps:
       - name: Cache inastaller files
@@ -22,6 +23,7 @@ jobs:
       - name: Setup AWS client
         run: sudo aws_install/aws/install
   package:
+    if: false
     runs-on: ubuntu-16.04
     steps:
       - uses: actions/checkout@v1
@@ -47,6 +49,7 @@ jobs:
           name: package-version
           path: build/version
   deploy:
+    if: false
     needs:
       - setup
       - package
