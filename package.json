@@ -12,7 +12,7 @@
     "@rollup/plugin-node-resolve": "^6.0.0",
     "@rollup/plugin-typescript": "^2.0.0",
     "@types/node": "^12.12.11",
-    "aws-sdk": "^2.577.0",
+    "aws-sdk": "^2.814.0",
     "gulp": "^4.0.2",
     "gulp-zip": "^5.0.1",
     "rollup": "^1.22.0",
